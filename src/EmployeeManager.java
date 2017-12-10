@@ -3,90 +3,8 @@ import java.util.ArrayList;
 
 public class EmployeeManager {
 
-    private ArrayList<Employee> employees;
-
-    private BufferedInputStream bis;
-    private ObjectInputStream ois;
-    private CustomObjectOutputStream oos;
     private File file;
-
-    private boolean storeEmployees(ArrayList<Employee> employees) {
-        boolean result = false;
-        try {
-            oos = new CustomObjectOutputStream(new FileOutputStream(file));
-            oos.writeObject(employees);
-            oos.flush();
-            result = true;
-        } catch (IOException e) {
-            System.out.println("Can't rewrite file " + file.getName());
-        }
-        return result;
-    }
-
-    private ArrayList<Employee> readEmployees() {
-        ArrayList<Employee> emps = new ArrayList<>();
-        try {
-            bis = new BufferedInputStream(new FileInputStream(file));
-            ois = new ObjectInputStream(bis);
-            emps = (ArrayList<Employee>) ois.readObject();
-            ois.close();
-        } catch (EOFException e) {
-            System.out.println(1);
-        } catch (IOException e) {
-            System.out.println("Cannot read file " + file.getName());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return emps;
-    }
-
-    public EmployeeManager(String filename) {
-        file = new File(filename);
-        employees = readEmployees();
-    }
-
-    public ArrayList<Employee> getByJob(String job) {
-        ArrayList<Employee> result = new ArrayList<>();
-        for (Employee emp : getEmployees()) {
-            if (emp.getJob().equals(job)) {
-                result.add(emp);
-            }
-        }
-        return result;
-    }
-
-    public Employee getByName(String name) {
-        for (Employee emp : getEmployees()) {
-            if (emp.getName().equals(name)) {
-                return emp;
-            }
-        }
-        return null;
-    }
-
-    public boolean saveEmployee(String name, int age, int salary, String job) {
-        Employee emp = new Employee(name, age, salary, job);
-        employees.add(emp);
-        return storeEmployees(employees);
-    }
-
-    public boolean deleteEmployee(String name) {
-        boolean result = false;
-        for (Employee emp : employees) {
-            if (emp.getName().equals(name)) {
-                employees.remove(emp);
-                if (storeEmployees(employees)) {
-                    result = true;
-                }
-                break;
-            }
-        }
-        return result;
-    }
-
-    public ArrayList<Employee> getEmployees() {
-        return readEmployees();
-    }
+    private EmployeeArray employees;
 
     private class CustomObjectOutputStream extends ObjectOutputStream {
         public CustomObjectOutputStream(OutputStream out) throws IOException {
@@ -97,5 +15,77 @@ public class EmployeeManager {
             super.writeStreamHeader();
             reset();
         }
+    }
+
+    EmployeeManager(String filename) {
+        file = new File(filename);
+        employees = readEmployees();
+    }
+
+    EmployeeArray readEmployees() {
+        EmployeeArray result = null;
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+            result = (EmployeeArray) ois.readObject();
+            ois.close();
+        } catch (EOFException e) {
+            return new EmployeeArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    boolean deleteEmployee(String name) {
+        for (int i = 0; i < employees.getList().size(); i++) {
+            if (employees.getList().get(i).getName().equals(name)) {
+                employees.getList().remove(i);
+                storeEmployees();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getSalary() {
+        return readEmployees().getSalarySum();
+    }
+
+    Employee getByName(String name) {
+        for (Employee emp : readEmployees().getList()) {
+            if (emp.getName().equals(name)) {
+                return emp;
+            }
+        }
+        return null;
+    }
+
+    ArrayList<Employee> getByJob(String job) {
+        ArrayList<Employee> result = new ArrayList<>();
+        for (Employee emp : readEmployees().getList()) {
+            if (emp.getJob().equals(job)) {
+                result.add(emp);
+            }
+        }
+        return result;
+    }
+
+    void storeEmployees() {
+        try {
+            CustomObjectOutputStream oos = new CustomObjectOutputStream(new FileOutputStream(file));
+            oos.writeObject(employees);
+            oos.flush();
+            oos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    boolean saveEmployee(String name, int age, int salary, String job) {
+        boolean result = true;
+            employees.getList().add(new Employee(name, age, salary, job));
+            storeEmployees();
+        return result;
     }
 }

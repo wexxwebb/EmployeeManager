@@ -2,11 +2,6 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void show(EmployeeManager manager) {
-        for (Employee employee : manager.getEmployees()) {
-            System.out.println(employee);
-        }
-    }
 
     public static void main(String[] args) {
 
@@ -30,7 +25,7 @@ public class Main {
                                 System.out.println("Ok");
                             }
                         } catch (Exception e) {
-
+                            e.printStackTrace();
                         }
                     } else {
                         System.out.println("Illegal command");
@@ -44,13 +39,16 @@ public class Main {
                         System.out.println(emp);
                     }
                     break;
+                case "salary" :
+                    System.out.println(manager.getSalary());
+                    break;
                 case "del":
                     if (manager.deleteEmployee(command[1])) {
                         System.out.println("Ok");
                     }
                     break;
                 case "all":
-                    for (Employee emp : manager.getEmployees()) {
+                    for (Employee emp : manager.readEmployees().getList()) {
                         System.out.println(emp);
                     }
                     break;

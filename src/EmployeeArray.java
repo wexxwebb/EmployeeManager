@@ -4,7 +4,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 
-public class EmployeeArray implements Externalizable {
+public class EmployeeArray {
 
     static final long serialVersionUID = 0;
 
@@ -24,19 +24,8 @@ public class EmployeeArray implements Externalizable {
         return salarySum;
     }
 
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeObject(list);
-        int result = 0;
-        for (Employee emp : list) {
-            result += emp.getSalary();
-        }
-        out.writeObject(new Integer(result));
+    public void setSalarySum(int salarySum) {
+        this.salarySum = salarySum;
     }
 
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        list = (ArrayList<Employee>) in.readObject();
-        salarySum = (Integer) in.readObject();
-    }
 }

@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class EmployeeManager {
 
@@ -25,11 +26,27 @@ public class EmployeeManager {
     EmployeeArray readEmployees() {
         EmployeeArray result = null;
         try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-            result = (EmployeeArray) ois.readObject();
-            ois.close();
-        } catch (EOFException e) {
-            return new EmployeeArray();
+            result = new EmployeeArray();
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+            int count = bis.read();
+            bis.read();
+            ArrayList<Integer> bytes = new ArrayList<>();
+            while (count > 0) {
+                int read = 0;
+                StringBuilder sb = new StringBuilder();
+                while ((read = bis.read()) != 10) {
+                    sb.append((char)read);
+                }
+                String[] emp = sb.toString().split(" :: ");
+                String name = emp[0];
+                int age = Integer.parseInt(emp[1]);
+                int salary = Integer.parseInt(emp[2]);
+                String job = emp[3];
+                result.getList().add(new Employee(name, age, salary, job));
+                count--;
+            }
+            result.setSalarySum(bis.read());
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,10 +90,16 @@ public class EmployeeManager {
 
     void storeEmployees() {
         try {
-            CustomObjectOutputStream oos = new CustomObjectOutputStream(new FileOutputStream(file));
-            oos.writeObject(employees);
-            oos.flush();
-            oos.close();
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+            bos.write(employees.getList().size());
+            bos.write("\n".getBytes());
+            int salary = 0;
+            for (int i = 0; i < employees.getList().size(); i++) {
+                bos.write(employees.getList().get(i).toFile().getBytes());
+                salary += employees.getList().get(i).getSalary();
+            }
+            bos.write(salary);
+            bos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,8 +107,16 @@ public class EmployeeManager {
 
     boolean saveEmployee(String name, int age, int salary, String job) {
         boolean result = true;
-            employees.getList().add(new Employee(name, age, salary, job));
-            storeEmployees();
+        Employee new_Employee = new Employee(name, age, salary, job);
+        for (int i = 0; i < employees.getList().size(); i++) {
+            if (name.equals(employees.getList().get(i).getName())) {
+                employees.getList().set(i, new_Employee);
+                storeEmployees();
+                return true;
+            }
+        }
+        employees.getList().add(new Employee(name, age, salary, job));
+        storeEmployees();
         return result;
     }
 }

@@ -24,6 +24,10 @@ public class Employee implements Serializable {
                 '}';
     }
 
+    public String toFile() {
+        return name  + " :: " + age + " :: " + salary + " :: " + job + "\n";
+    }
+
     public String getName() {
         return name;
     }

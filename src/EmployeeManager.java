@@ -30,10 +30,13 @@ public class EmployeeManager {
             ois.close();
         } catch (EOFException e) {
             return new EmployeeArray();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            System.out.println("File " + file.getName() + " not found");
+        } catch (IOException e) {
+            System.out.println("Can't read file " + file.getName());
+        } catch (ClassNotFoundException e) {
+            System.out.println("Can't read object");
         }
-
         return result;
     }
 
@@ -77,15 +80,22 @@ public class EmployeeManager {
             oos.writeObject(employees);
             oos.flush();
             oos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Can't write file " + file.getName());
         }
     }
 
     boolean saveEmployee(String name, int age, int salary, String job) {
-        boolean result = true;
-            employees.getList().add(new Employee(name, age, salary, job));
-            storeEmployees();
-        return result;
+        Employee new_Employee = new Employee(name, age, salary, job);
+        for (int i = 0; i < employees.getList().size(); i++) {
+            if (name.equals(employees.getList().get(i).getName())) {
+                employees.getList().set(i, new_Employee);
+                storeEmployees();
+                return true;
+            }
+        }
+        employees.getList().add(new Employee(name, age, salary, job));
+        storeEmployees();
+        return true;
     }
 }

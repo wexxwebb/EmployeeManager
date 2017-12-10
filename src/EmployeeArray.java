@@ -1,12 +1,6 @@
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.ArrayList;
 
 public class EmployeeArray {
-
-    static final long serialVersionUID = 0;
 
     private ArrayList<Employee> list;
     private int salarySum;

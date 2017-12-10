@@ -1,22 +1,10 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class EmployeeManager {
 
     private File file;
     private EmployeeArray employees;
-
-    private class CustomObjectOutputStream extends ObjectOutputStream {
-        public CustomObjectOutputStream(OutputStream out) throws IOException {
-            super(out);
-        }
-        @Override
-        protected void writeStreamHeader() throws IOException {
-            super.writeStreamHeader();
-            reset();
-        }
-    }
 
     EmployeeManager(String filename) {
         file = new File(filename);
@@ -32,7 +20,7 @@ public class EmployeeManager {
             bis.read();
             ArrayList<Integer> bytes = new ArrayList<>();
             while (count > 0) {
-                int read = 0;
+                int read;
                 StringBuilder sb = new StringBuilder();
                 while ((read = bis.read()) != 10) {
                     sb.append((char)read);
@@ -47,10 +35,11 @@ public class EmployeeManager {
             }
             result.setSalarySum(bis.read());
             return result;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            System.out.println("File " + file.getName() + " not found.");
+        } catch (IOException e) {
+            System.out.println("Can't read file " + file.getName());
         }
-
         return result;
     }
 
@@ -100,13 +89,15 @@ public class EmployeeManager {
             }
             bos.write(salary);
             bos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            System.out.println("File " + file.getName() + " not found");
+        } catch (IOException e) {
+            System.out.println("Can't write file " + file.getName());
         }
     }
 
     boolean saveEmployee(String name, int age, int salary, String job) {
-        boolean result = true;
+        boolean result = false;
         Employee new_Employee = new Employee(name, age, salary, job);
         for (int i = 0; i < employees.getList().size(); i++) {
             if (name.equals(employees.getList().get(i).getName())) {
@@ -117,6 +108,6 @@ public class EmployeeManager {
         }
         employees.getList().add(new Employee(name, age, salary, job));
         storeEmployees();
-        return result;
+        return true;
     }
 }

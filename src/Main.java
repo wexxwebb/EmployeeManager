@@ -2,30 +2,25 @@ import java.util.Scanner;
 
 public class Main {
 
-
     public static void main(String[] args) {
 
         EmployeeManager manager = new EmployeeManager("employee.dat");
-
         Scanner scanner = new Scanner(System.in);
         String line;
         boolean play = true;
+
         while (play) {
             line = scanner.nextLine();
             String[] command = line.split(" ");
             switch (command[0]) {
                 case "save":
                     if (command.length == 5) {
-                        try {
-                            String name = command[1];
-                            int age = Integer.parseInt(command[2]);
-                            int salary = Integer.parseInt(command[3]);
-                            String job = command[4];
-                            if (manager.saveEmployee(name, age, salary, job)) {
-                                System.out.println("Ok");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        String name = command[1];
+                        int age = Integer.parseInt(command[2]);
+                        int salary = Integer.parseInt(command[3]);
+                        String job = command[4];
+                        if (manager.saveEmployee(name, age, salary, job)) {
+                            System.out.println("Ok");
                         }
                     } else {
                         System.out.println("Illegal command");
@@ -59,6 +54,5 @@ public class Main {
                     System.out.println("Illegal command");
             }
         }
-
     }
 }
